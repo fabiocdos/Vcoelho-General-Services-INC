@@ -1,0 +1,12 @@
+# Texto normalizado como LF no repositório (histórico estável entre sistemas);
+# imagens ficam como binário.
+* text=auto
+*.html text
+*.css text
+*.js text
+*.xml text
+*.md text
+*.txt text
+*.png binary
+*.jpg binary
+*.jpeg binary

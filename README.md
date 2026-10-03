@@ -251,30 +251,45 @@ heading focused). `__measure.html` is kept in the root as a layout-measuring
 harness (its URL is what the client used to pick the design) and is excluded from
 the deploy zip together with any other `__*.html`.
 
+## Deployment
+
+- **Live:** https://fabiocdos.github.io/Vcoelho-General-Services-INC/ — GitHub Pages,
+  branch `main`, source folder `/`, HTTPS enforced. Repo:
+  https://github.com/fabiocdos/Vcoelho-General-Services-INC
+- The repository holds only what is publishable: the `.gitignore` keeps the root-level
+  working material out (original photos, review screenshots, the design reference,
+  `vcoelho-site.zip`, `__*.html` harnesses) and `pack-site.ps1` zips the same set.
+- A custom domain can be added later in *Settings → Pages → Custom domain*.
+
+## Confirmed by the client (2026-10-03)
+
+- **"8+ Years" experience claim** — confirmed. It is used in the trust bar, the About
+  section and the About meta description; no wording change needed.
+- **Photo rights** — approved for publication. Every photo comes from the client's own
+  folder (`Fencing/Hardscaping/Landscape/Snow Plowing 1…n.jpg`, `logo.jpeg`), is wired
+  up in `assets/images/` and described in the service cards, gallery tags and alt text —
+  nothing in the folder is unused.
+- **Reviews attribution** — approved. The five real reviews are published verbatim
+  (typos included); screenshots 4–5 are labelled "Yelp" and the remaining ones are
+  published as supplied.
+
 ## Open items
 
 1. **Social URLs are placeholders.** `instagram.com/vcoelhogeneralservices` and
    `facebook.com/vcoelhogeneralservices` were assumed — confirm the real handles.
 2. **Canonical + Open Graph URLs.** `sitemap.xml` uses
-   `https://www.vcoelhogeneralservices.com` — replace with the actual domain, then add
+   `https://www.vcoelhogeneralservices.com` — replace with the actual domain (the site
+   is currently live on the GitHub Pages URL above), then add
    `<link rel="canonical">` to every page.
 3. **Form delivery.** Point the quote form at a real endpoint (see above).
-4. **Photo rights.** All site photos come from the client's own folder
-   (`Fencing/Hardscaping/Landscape/Snow Plowing 1…n.jpg`, `logo.jpeg`) and are already
-   wired up in `assets/images/` with service names in the gallery tags, service cards
-   and alt text — nothing in the folder is unused. Confirm the client is happy to publish them.
-5. **Reviews page.** Now holds the five real reviews the client supplied (transcribed
-   verbatim, typos included). Confirm the wording and whether you want the first three
-   attributed to the lead platform they came from (screenshots 4–5 are labelled "Yelp").
-6. **"8+ Years" experience claim.** Used in the trust bar, the hero badge and the
-   About meta description — confirm the number with the client before launch.
-7. **Alt text / gallery captions.** Every photo was reviewed against its actual
+4. **Alt text / gallery captions.** Every photo was reviewed against its actual
    image and the descriptions were corrected to match (e.g. the four fencing photos
    and the stone terrace). Re-check captions whenever a photo is swapped.
-8. **Do not deploy the root-level source files.** `*.jpg` originals, `logo.jpeg`,
+5. **Root-level source files stay out of the build.** `*.jpg` originals, `logo.jpeg`,
    `Simbolo da logo.jpeg`, `Referencia de design de site.png` and `Review 1–5.jpeg`
    live in the site root as working material — publish only `*.html`, `assets/**`,
-   `sitemap.xml` and `robots.txt`.
+   `sitemap.xml` and `robots.txt`. Enforced by `.gitignore` (repo) and by the packaging
+   script (zip).
 
 ## Contact details used throughout
 

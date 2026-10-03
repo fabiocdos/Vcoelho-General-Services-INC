@@ -1,0 +1,10 @@
+# Material de trabalho — não faz parte do site publicável.
+# As fotos usadas pelo site estão em assets/images/.
+/__*.html
+/vcoelho-site.zip
+/Referencia de design de site.png
+/*.jpg
+/*.jpeg
+/*.png
+/Thumbs.db
+/desktop.ini

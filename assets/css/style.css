@@ -1032,7 +1032,7 @@ body.modal-open{overflow:hidden}
 .page-hero .container{position:relative; z-index:1}
 .page-hero h1{
   color:#fff; font-size:clamp(2.4rem,5vw,4rem);
-  max-width:16ch; margin-bottom:.36em;
+  max-width:28ch; margin-bottom:.36em;
 }
 .page-hero h1 .accent{color:var(--lime); font-style:italic}
 .page-hero .eyebrow{color:var(--lime)}

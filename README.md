@@ -251,6 +251,31 @@ heading focused). `__measure.html` is kept in the root as a layout-measuring
 harness (its URL is what the client used to pick the design) and is excluded from
 the deploy zip together with any other `__*.html`.
 
+## Round 5 - fencing photo swap (2026-10-07)
+
+- The client replaced the four source photos `Fencing 1-4.jpg` with new
+  `Fencing 1-4.jpeg` (1200x1600 portrait, EXIF orientation 1). They are now
+  published as `assets/images/fencing-1..4.jpg`, center-cropped to **1100x825
+  (4:3)** - the exact ratio used by the hero, the mini-gallery, the split media
+  and the gallery tiles - at JPEG quality 70 (167-195 KB each, 731 KB total).
+- Alt text, `figcaption` captions and gallery/lightbox names were rewritten to
+  describe the new photos: **Picket Fence & Gate**, **Post-and-Rail Fence**,
+  **Privacy Fence & Driveway**, **Porch Enclosure Fence** (replacing "Cedar
+  Privacy Fence", "On-Site Installation"/"Fence Installation", "Privacy Fence &
+  Planting Bed" and "Fence with Patio"/"Horizontal Fence & Paver Patio").
+- `width`/`height` attributes updated to 1100x825 in `fencing.html`
+  (5 images) and `our-work.html` (4 images), so the intrinsic ratio matches
+  the CSS 4:3 slots exactly: no cropping by the browser and no layout shift.
+- `fence-vcoelho.jpg` (wooden privacy fence used on Home, About, Our Work and
+  the fencing intro) was **not** swapped; its alt text still matches the photo.
+- QA: static audit 0 issues / 259 links; 0 horizontal overflow at 390 / 560 /
+  641 / 768 / 1004 / 1440 px on `fencing` and `our-work`; all 22 gallery
+  images load; lightbox shows the new names; Lighthouse 100 / 100 / 100 on both
+  pages.
+- Still unused in the root: `WhatsApp Image 2026-10-06 at 01.48.00.jpeg`
+  (1200x1600 - white vinyl fence beside a house walkway) - waiting for the
+  client's instruction on where to place it.
+
 ## Deployment
 
 - **Live:** https://fabiocdos.github.io/Vcoelho-General-Services-INC/ — GitHub Pages,

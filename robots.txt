@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-# Site owner: Vcoelho General Services INC — Rockland, MA 02370
+Sitemap: https://vcoelhogeneralservices.com/sitemap.xml

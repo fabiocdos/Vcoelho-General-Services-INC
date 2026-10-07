@@ -408,8 +408,21 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
 - Metadata QC: 0 issues (canonical == og:url, no noindex, robots/sitemap valid).
 - JSON-LD check: 0 issues. Heading/label audit: 0 issues. Anchor audit: 0 issues.
 - 0 horizontal overflow at 390/560/641/768/1004/1440 px; homepage height frozen.
-- Lighthouse 100/100/100 (accessibility / best practices / SEO) on index,
-  landscaping, fencing, snow-plowing and request-a-quote.
+- Lighthouse on the **live domain after deployment: 100 / 100 / 100 on all 10
+  pages (30/30, zero failures)** - accessibility, best practices and SEO; the
+  same three categories pass on the local copy too.
+- Post-deploy pass on production (2026-10-07): the footer logo was being drawn
+  squashed between roughly 768-850 px (a fixed `height:52px` against a 96-119 px
+  footer track). Fixed with `object-fit:contain` on `.footer-brand img`: the box
+  keeps the exact same 52 px height (homepage re-measured at 2285 / 2557 / 2301
+  px), the content keeps its 487x165 ratio, and Lighthouse stops flagging
+  `image-aspect-ratio` (that audit only inspects `object-fit:fill` images).
+- CSS and JS are now referenced with `?v=20261007`: Hostinger serves assets with
+  `max-age=604800`, so without a version query returning visitors - and the CDN -
+  would keep the previous stylesheet/script for up to a week.
+- Re-verified after those changes: W3C HTML5 again **0 errors / 0 warnings** on all
+  10 pages, 292 internal links / 0 broken, homepage heights unchanged, 0 horizontal
+  overflow on 6 pages x 5 widths.
 - W3C HTML5 (Nu) validator: **0 errors, 0 warnings on all 10 pages** - fixed
   `autocomplete="street-address"` (a multiline token, valid only on `textarea`)
   to `address-line1` on both quote forms, and the About trust bar from

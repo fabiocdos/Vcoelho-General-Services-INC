@@ -1217,7 +1217,7 @@ body.modal-open{overflow:hidden}
   gap:clamp(28px,3.4vw,54px);
   padding-bottom:clamp(38px,4vw,58px);
 }
-.footer-brand img{height:52px; width:auto; margin-bottom:20px}
+.footer-brand img{height:52px; width:auto; margin-bottom:20px; object-fit:contain}
 .footer-brand p{
   font-family:var(--serif);
   font-size:20px; font-style:italic;

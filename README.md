@@ -233,7 +233,7 @@ Totals:
 
 | Page | 1004px before | 1004px after |
 |---|---|---|
-| index (reference) | 2285 | **2285 (unchanged)** · 2557 at 1440px · **2298 at 892px** (was 3784 stacked) |
+| index (reference) | 2285 | **2285 (unchanged)** · 2557 at 1440px · **2301 at 892px** (was 3784 stacked) |
 | landscaping | 5589 | **4126** |
 | fencing | 5155 | **3723** |
 | hardscaping | 5439 | **3956** |
@@ -251,7 +251,7 @@ heading focused). `__measure.html` is kept in the root as a layout-measuring
 harness (its URL is what the client used to pick the design) and is excluded from
 the deploy zip together with any other `__*.html`.
 
-## Round 5 - fencing photo swap (2026-10-07)
+## Round 5 - photo refresh (2026-10-07)
 
 - The client replaced the four source photos `Fencing 1-4.jpg` with new
   `Fencing 1-4.jpeg` (1200x1600 portrait, EXIF orientation 1). They are now
@@ -266,15 +266,32 @@ the deploy zip together with any other `__*.html`.
 - `width`/`height` attributes updated to 1100x825 in `fencing.html`
   (5 images) and `our-work.html` (4 images), so the intrinsic ratio matches
   the CSS 4:3 slots exactly: no cropping by the browser and no layout shift.
-- `fence-vcoelho.jpg` (wooden privacy fence used on Home, About, Our Work and
-  the fencing intro) was **not** swapped; its alt text still matches the photo.
+- `fence-vcoelho.jpg` was left alone for this first swap (its wooden-fence alt
+  text still matched) and replaced in the second request documented below.
 - QA: static audit 0 issues / 259 links; 0 horizontal overflow at 390 / 560 /
   641 / 768 / 1004 / 1440 px on `fencing` and `our-work`; all 22 gallery
   images load; lightbox shows the new names; Lighthouse 100 / 100 / 100 on both
   pages.
-- Still unused in the root: `WhatsApp Image 2026-10-06 at 01.48.00.jpeg`
-  (1200x1600 - white vinyl fence beside a house walkway) - waiting for the
-  client's instruction on where to place it.
+- Second request, same day: the client chose
+  `WhatsApp Image 2026-10-06 at 01.48.00.jpeg` to **replace `fence-vcoelho.jpg`**
+  - the photo used by the Home fencing card, the Home photo strip, the About card,
+  the fencing intro, the Our Work hero and the Our Work gallery. It was resized
+  1200x1600 -> 900x1200 (same 3:4 ratio, no crop, quality 70 = 194 KB against the
+  215 KB it replaced), so all seven `width="900" height="1200"` attributes stayed
+  valid and no markup dimension changed.
+- Its description now reads "White vinyl fence running alongside the paved walkway
+  of a gray house" in those 7 places, and the Our Work gallery item was renamed
+  from "Wooden Privacy Fence" to "Vinyl Fence & Walkway" (lightbox label too).
+- Home re-measured after the swap: **2285 px at 1004 px** and **2557 px at 1440 px**
+  - unchanged. At 892 px it measures 2301 px both with the new files and with the
+  previous commit (`a972b99`), so the "2298 px" recorded in Round 4 was
+  measurement drift, not a layout change; the table above shows the value measured
+  today.
+- QA after both swaps: static audit 0 issues / 259 links; **0 overflow** at
+  390 / 768 / 1004 / 1440 px on index, about, fencing and our-work; no broken
+  images (22 images on our-work, 9 on fencing); **Lighthouse 100 / 100 / 100** on
+  all four pages. Every root source photo is now wired into the site - nothing is
+  left waiting in the root.
 
 ## Deployment
 

@@ -414,6 +414,12 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
   `autocomplete="street-address"` (a multiline token, valid only on `textarea`)
   to `address-line1` on both quote forms, and the About trust bar from
   `<section>` to `<div>` (it carries no heading; no CSS selects that element).
+- Core Web Vitals measured on the **live domain** (headless Chromium 154 driven
+  over CDP, no throttling): home desktop FCP 912 ms, LCP 1632 ms (hero `<img>`),
+  CLS 0.0006, TTFB 395 ms; inner pages FCP = LCP 444-476 ms with CLS 0; **0 long
+  tasks** on every page. Mobile viewport (390x844, repeat load with warm cache):
+  FCP/LCP 56-68 ms, CLS 0. PageSpeed Insights (Lighthouse throttling + field
+  data) still has to be run by the owner on the live URL.
 - Not run (needs the live domain): Google Rich Results Test, Search Console
   "Sitemaps" upload, PageSpeed Insights field data.
 
@@ -426,9 +432,16 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
 4. Decision on switching the CTA wording to "REQUEST A FREE QUOTE".
 ## Deployment
 
-- **Live:** https://fabiocdos.github.io/Vcoelho-General-Services-INC/ — GitHub Pages,
-  branch `main`, source folder `/`, HTTPS enforced. Repo:
-  https://github.com/fabiocdos/Vcoelho-General-Services-INC
+- **Live (production):** https://vcoelhogeneralservices.com/ - Hostinger,
+  maintained from this repository. Verified on 2026-10-07 right after the SEO
+  push: all 10 sitemap URLs return HTTP 200, `robots.txt` and `sitemap.xml` are
+  served from the canonical domain, and the canonical / Open Graph / JSON-LD
+  blocks are present in the HTML actually served. `http://` already redirects
+  to `https://`; a 301 from `www.` to the bare domain is still missing (Open
+  items #3).
+- **Preview:** https://fabiocdos.github.io/Vcoelho-General-Services-INC/ - GitHub
+  Pages, branch `main`, source folder `/`, HTTPS enforced; rebuilds ~1 min after
+  each push. Repo: https://github.com/fabiocdos/Vcoelho-General-Services-INC
 - The repository holds only what is publishable: the `.gitignore` keeps the root-level
   working material out (original photos, review screenshots, the design reference,
   `vcoelho-site.zip`, `__*.html` harnesses) and `pack-site.ps1` zips the same set.
@@ -451,9 +464,11 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
 1. **Form delivery.** The quote form still runs on the `mailto:` fallback plus
    the local `vcoelho_leads` store - point it at a real endpoint (Formspree,
    Hostinger PHP, Netlify Forms) to collect submissions server-side.
-2. **Google Search Console + GA4.** Neither was added (codes must not be
-   invented). Needed: the GSC verification value (TXT or meta tag) and the GA4
-   measurement ID.
+2. **Google Search Console + GA4.** The domain verification TXT record
+   (`google-site-verification=...`) is already published in the Hostinger DNS by
+   the owner. Still needed: add the *domain property* in Search Console, confirm
+   the verification and submit `sitemap.xml`; plus the GA4 measurement ID (not
+   added - it must not be invented).
 3. **Hostinger redirects.** Force HTTPS and send `www.` to the bare domain -
    canonicals, OG and the sitemap already use
    `https://vcoelhogeneralservices.com/`.
@@ -468,6 +483,7 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
    `Review 1-5.jpeg` live in the site root as working material - publish only
    `*.html`, `assets/**`, `sitemap.xml` and `robots.txt`. Enforced by `.gitignore`
    (repo) and by the packaging script (zip).
+
 ## Contact details used throughout
 
 - **Phone:** 508-577-5637 (`tel:+15085775637`)

@@ -293,6 +293,137 @@ the deploy zip together with any other `__*.html`.
   all four pages. Every root source photo is now wired into the site - nothing is
   left waiting in the root.
 
+## Round 6 - SEO (2026-10-07)
+
+Complete technical + local SEO pass. No visual redesign: layout, typography,
+colors, navigation and the frozen homepage are untouched (heights re-measured at
+2285 px @1004, 2557 px @1440, 2301 px @892). Canonical domain from the brief:
+`https://vcoelhogeneralservices.com/` (bare domain, HTTPS).
+
+### Files created
+
+- `request-a-quote.html` - dedicated quote landing page: hero, the existing quote
+  form (same 8 labelled fields, `mailto:` action, validation, thank-you state),
+  service links and the CTA band. Linked from every page header/hero/section CTA.
+- `assets/images/share-vcoelho.jpg` - 1200x630, 161 KB social card built from the
+  homepage hero photo + white logo + tagline; used as `og:image` / `twitter:image`
+  on all 10 pages (it is never rendered inside a page).
+- FAQ sections (`<section id="faq">`) on `landscaping.html` (5 questions),
+  `fencing.html` (4) and `snow-plowing.html` (4), with a `.faq-grid` CSS block
+  appended to `assets/css/style.css` (section 38).
+
+### Files modified
+
+- All 9 original HTML pages: `<head>`, service H1s, phone links, social links,
+  quote CTA hrefs, JSON-LD.
+- `robots.txt`, `sitemap.xml`, `assets/js/site.js` (`PHONE_RAW`), `assets/css/style.css`.
+
+### Metadata
+
+- Titles and meta descriptions set exactly as specified in the brief, unique
+  across the 10 pages (checked: 10 unique titles, 10 unique descriptions,
+  title 15-75 chars, description 50-170 chars).
+- Service H1s now carry service + city, e.g. `Professional Landscaping Services in
+  Rockland, MA`, `Professional Fence Installation in Rockland, MA`, `Reliable Snow
+  Plowing Services in Rockland, MA`. The homepage H1 stays the brand line
+  `Quality Work. Reliable Service. Every Season.` (not keyword-stuffed).
+- `.page-hero h1` `max-width` 16ch -> 28ch so the longer H1s still break into
+  exactly two lines at every width (verified in the browser: 2 lines on all
+  inner pages, hero height unchanged at 363 px).
+
+### Canonical, Open Graph, Twitter
+
+- `<link rel="canonical">` on all 10 pages, pointing at existing URLs only
+  (home = `/`, inner pages keep their `.html` - no URL migration, no redirects).
+- `og:url` equals the canonical on every page; `og:site_name`, `og:locale=en_US`,
+  absolute `og:image` with `og:image:width/height/alt`; `twitter:title`,
+  `twitter:description`, `twitter:image`, `twitter:image:alt`;
+  `<meta name="robots" content="index, follow, max-image-preview:large">`
+  (no `noindex` anywhere).
+
+### Structured data (JSON-LD, one `@graph` per page)
+
+- Home: `LandscapingBusiness` (name, alternateName, url, image, logo, telephone,
+  email, locality-level `PostalAddress` Rockland/MA/02370 **without street**,
+  `openingHoursSpecification` Mon-Sat 07:00-18:00, `areaServed` Rockland,
+  Massachusetts, `sameAs` = the two real social profiles) + `WebSite`.
+- Service pages: `Service` with `serviceType`, `provider` (inline business data),
+  `description` (identical to that page's meta description) and `areaServed`.
+- Inner pages: `BreadcrumbList` matching the visible breadcrumb (Services links to
+  `/#services`, which exists).
+- FAQ pages: `FAQPage` - every question and answer is verified to exist verbatim
+  in the visible HTML.
+- Deliberately absent: street address, geo coordinates, priceRange,
+  aggregateRating, reviewCount, foundingDate, hours beyond Mon-Sat 7-18.
+  Validated by script: parses, arrays intact, sequential breadcrumb positions,
+  `Service.description` == meta description, 0 issues.
+
+### robots.txt / sitemap.xml
+
+- robots: `User-agent: *` / `Allow: /` / `Sitemap: https://vcoelhogeneralservices.com/sitemap.xml`
+  (no Disallow, CSS/JS/images all crawlable).
+- sitemap: 10 HTTPS URLs on the canonical domain (home as `/`, never
+  `/index.html`), `lastmod` 2026-10-07, no duplicates, every URL has a matching
+  canonical in its page and every page is in the sitemap.
+
+### Images
+
+- 94 `<img>` tags: all with meaningful `alt`, all with `width`/`height`
+  (0 mismatches against the actual files - no CLS), below-the-fold lazy,
+  hero images eager with `fetchpriority="high"`.
+- **Filenames were deliberately not renamed.** The site is already live, so
+  renaming cached image URLs would create 404s for a marginal signal - the
+  descriptive `alt` text (reviewed photo by photo) is the stronger signal. If the
+  owner wants it later, do it with redirects before wider indexing.
+- No stock photos, no photo replaced; only the new share card was added.
+
+### Accessibility / performance
+
+- One H1 per page, no heading level skips, every form control labelled, landmarks
+  + skip link present, alt on all images.
+- No performance change needed: one deferred script, one stylesheet, Google Fonts
+  with `preconnect` + `display=swap`, no third-party scripts, images sized/lazy.
+  **No analytics is installed** (GA4/GSC ID needed from the owner).
+
+### Internal linking / conversion
+
+- 42 quote CTAs across the 8 other pages now fall back to
+  `request-a-quote.html` while `data-quote` keeps opening the modal (JS calls
+  `preventDefault`), so the UX is unchanged and the new page is crawlable.
+- Per page: 4-7 quote CTAs (header, hero, sections, final CTA, footer) on every
+  page without a form; `contact.html` and `request-a-quote.html` keep the in-page
+  `#quote` anchor. Mobile bar keeps CALL US | GET A QUOTE.
+- 40+ distinct descriptive anchor texts, no "click here"/"read more".
+
+### Contact consistency
+
+- 28 `tel:` links in HTML + the 2 built by JS (mobile bar, modal) now use
+  `tel:+15085775637`; display text stays `508-577-5637`.
+- Facebook/Instagram corrected to the real profiles (45 links), `rel` OK on
+  external links; email unchanged.
+
+### QA actually run
+
+- Static audit: 10 pages, 292 internal links, **0 broken**, 0 issues.
+- Metadata QC: 0 issues (canonical == og:url, no noindex, robots/sitemap valid).
+- JSON-LD check: 0 issues. Heading/label audit: 0 issues. Anchor audit: 0 issues.
+- 0 horizontal overflow at 390/560/641/768/1004/1440 px; homepage height frozen.
+- Lighthouse 100/100/100 (accessibility / best practices / SEO) on index,
+  landscaping, fencing, snow-plowing and request-a-quote.
+- W3C HTML5 (Nu) validator: **0 errors, 0 warnings on all 10 pages** - fixed
+  `autocomplete="street-address"` (a multiline token, valid only on `textarea`)
+  to `address-line1` on both quote forms, and the About trust bar from
+  `<section>` to `<div>` (it carries no heading; no CSS selects that element).
+- Not run (needs the live domain): Google Rich Results Test, Search Console
+  "Sitemaps" upload, PageSpeed Insights field data.
+
+### Still needed from the owner
+
+1. Google Search Console verification (string or DNS TXT) and the GA4 ID.
+2. Hostinger redirect rules: force HTTPS and redirect `www.` to the bare domain,
+   so the four duplicate versions collapse onto the canonical.
+3. Optional: the real Google Business Profile reviews URL (no link invented).
+4. Decision on switching the CTA wording to "REQUEST A FREE QUOTE".
 ## Deployment
 
 - **Live:** https://fabiocdos.github.io/Vcoelho-General-Services-INC/ — GitHub Pages,
@@ -317,25 +448,29 @@ the deploy zip together with any other `__*.html`.
 
 ## Open items
 
-1. **Social URLs are placeholders.** `instagram.com/vcoelhogeneralservices` and
-   `facebook.com/vcoelhogeneralservices` were assumed — confirm the real handles.
-2. **Canonical + Open Graph URLs.** `sitemap.xml` uses
-   `https://www.vcoelhogeneralservices.com` — replace with the actual domain (the site
-   is currently live on the GitHub Pages URL above), then add
-   `<link rel="canonical">` to every page.
-3. **Form delivery.** Point the quote form at a real endpoint (see above).
-4. **Alt text / gallery captions.** Every photo was reviewed against its actual
-   image and the descriptions were corrected to match (e.g. the four fencing photos
-   and the stone terrace). Re-check captions whenever a photo is swapped.
-5. **Root-level source files stay out of the build.** `*.jpg` originals, `logo.jpeg`,
-   `Simbolo da logo.jpeg`, `Referencia de design de site.png` and `Review 1–5.jpeg`
-   live in the site root as working material — publish only `*.html`, `assets/**`,
-   `sitemap.xml` and `robots.txt`. Enforced by `.gitignore` (repo) and by the packaging
-   script (zip).
-
+1. **Form delivery.** The quote form still runs on the `mailto:` fallback plus
+   the local `vcoelho_leads` store - point it at a real endpoint (Formspree,
+   Hostinger PHP, Netlify Forms) to collect submissions server-side.
+2. **Google Search Console + GA4.** Neither was added (codes must not be
+   invented). Needed: the GSC verification value (TXT or meta tag) and the GA4
+   measurement ID.
+3. **Hostinger redirects.** Force HTTPS and send `www.` to the bare domain -
+   canonicals, OG and the sitemap already use
+   `https://vcoelhogeneralservices.com/`.
+4. **Third-party review link.** Only add a real Google Business Profile review
+   URL when the client provides it.
+5. **CTA wording.** The brief asks for "REQUEST A FREE QUOTE"; buttons keep
+   "Request a Quote" per the client's earlier choice - one word confirms it.
+6. **Alt text / gallery captions.** Every photo is described from its actual
+   image; re-check captions whenever a photo is swapped (client rule).
+7. **Root-level source files stay out of the build.** `*.jpg` originals,
+   `logo.jpeg`, `Simbolo da logo.jpeg`, `Referencia de design de site.png` and
+   `Review 1-5.jpeg` live in the site root as working material - publish only
+   `*.html`, `assets/**`, `sitemap.xml` and `robots.txt`. Enforced by `.gitignore`
+   (repo) and by the packaging script (zip).
 ## Contact details used throughout
 
-- **Phone:** 508-577-5637 (`tel:5085775637`)
+- **Phone:** 508-577-5637 (`tel:+15085775637`)
 - **Email:** vcoelhogeneralservices@hotmail.com
 - **Location:** Rockland, MA 02370
 - **Hours:** Mon–Sat 7:00 AM – 6:00 PM

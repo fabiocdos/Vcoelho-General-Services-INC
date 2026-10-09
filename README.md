@@ -75,6 +75,9 @@ Open `index.html` directly, or serve the folder with any static server.
 - Spam control: hidden `_honey` honeypot (labelled for a11y checkers) with
   `_captcha=false` - FormSubmit's reCAPTCHA would break the AJAX flow. `_subject`
   and `_template=table` shape the email that lands in the inbox.
+- Photo uploads are capped by FormSubmit at **10 MB in total** per submission;
+  anything larger is rejected by the endpoint, which lands the visitor on the
+  same fallback alert (the text channels still work).
 - Lead data is also stored in `localStorage` under `vcoelho_leads` and pushed to `window.dataLayer`
 - Available via: header CTA, hero CTA, section CTAs, service-page CTAs, mobile bottom bar, and the inline forms on `contact.html#quote` and `request-a-quote.html`
 

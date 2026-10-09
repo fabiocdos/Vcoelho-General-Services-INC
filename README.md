@@ -539,7 +539,11 @@ address, service, property type, project):
   served from the canonical domain, and the canonical / Open Graph / JSON-LD
   blocks are present in the HTML actually served. `http://` already redirects
   to `https://`; a 301 from `www.` to the bare domain is still missing (Open
-  items #3).
+  items #3). Re-verified on 2026-10-09 after the quote-form push (Round 7): the
+  served `request-a-quote.html` carries the FormSubmit action, the honeypot and
+  the `?v=20261009` assets, the sitemap `lastmod` is 2026-10-09, and a real
+  test submission posted from the live page was accepted by FormSubmit in
+  1.19 s (thank-you state, no fallback).
 - **Preview:** https://fabiocdos.github.io/Vcoelho-General-Services-INC/ - GitHub
   Pages, branch `main`, source folder `/`, HTTPS enforced; rebuilds ~1 min after
   each push. Repo: https://github.com/fabiocdos/Vcoelho-General-Services-INC

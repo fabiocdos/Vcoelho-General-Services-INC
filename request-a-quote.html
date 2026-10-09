@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
-<link rel="stylesheet" href="assets/css/style.css?v=20261007">
+<link rel="stylesheet" href="assets/css/style.css?v=20261009">
 <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -192,7 +192,12 @@
             <p>Tell us about your property and we'll get back to you with next steps.</p>
           </div>
 
-          <form class="quote-form" novalidate action="mailto:vcoelhogeneralservices@hotmail.com" method="post" enctype="text/plain" data-quote-form>
+          <form class="quote-form" novalidate action="https://formsubmit.co/vcoelhogeneralservices@hotmail.com" method="post" enctype="multipart/form-data" data-quote-form>
+            <input type="hidden" name="_subject" value="Quote request - vcoelhogeneralservices.com">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_next" value="https://vcoelhogeneralservices.com/request-a-quote.html?sent=1">
+            <input type="text" name="_honey" value="" style="display:none" tabindex="-1" autocomplete="off" aria-label="Leave this field empty">
             <div class="form-grid">
               <div class="field" data-field="fullName">
                 <label for="c-name">Full Name<span class="req" aria-hidden="true">*</span></label>
@@ -257,12 +262,25 @@
                 </label>
               </div>
 
+              <div class="form-alert" data-form-alert role="alert" hidden>
+                <p><strong data-alert-title>We couldn't send this automatically.</strong> <span data-alert-msg>Send your request right now &mdash; your details are already filled in:</span></p>
+                <p class="form-alert-links">
+                  <a data-channel="whatsapp" target="_blank" rel="noopener" href="https://wa.me/15085775637">Send on WhatsApp</a>
+                  <span aria-hidden="true"> &middot; </span>
+                  <a data-channel="sms" target="_blank" rel="noopener" href="sms:+15085775637">Send by SMS</a>
+                  <span aria-hidden="true"> &middot; </span>
+                  <a data-mailto href="mailto:vcoelhogeneralservices@hotmail.com">Send by e-mail</a>
+                </p>
+                <p class="tiny">You can also press submit again, or call 508-577-5637.</p>
+              </div>
+
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary btn-lg btn-block">
                   Request My Quote
                   <svg class="icon arrow" aria-hidden="true"><use href="#i-arrow"></use></svg>
                 </button>
               </div>
+              <p class="form-alt">Rather send it yourself? <a data-channel="whatsapp" target="_blank" rel="noopener" href="https://wa.me/15085775637">Send it on WhatsApp</a> or <a data-channel="sms" target="_blank" rel="noopener" href="sms:+15085775637">send a text</a> &mdash; we pre-fill your message.</p>
               <p class="form-legal">By submitting, you agree to be contacted about your request. We never share your details.</p>
             </div>
           </form>
@@ -270,12 +288,13 @@
           <div class="form-success" hidden>
             <div class="icon-badge"><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg></div>
             <h3>Thank you for contacting Vcoelho General Services INC.</h3>
-            <p>We've received your request and will review your project details.</p>
+            <p>Your request has been sent to our team. We'll review your project details and get back to you shortly.</p>
             <div class="btn-row">
-              <a class="btn btn-primary" href="tel:+15085775637">Call 508-577-5637 <svg class="icon arrow" aria-hidden="true"><use href="#i-phone"></use></svg></a>
-              <a class="btn btn-outline" data-mailto href="mailto:vcoelhogeneralservices@hotmail.com">Send by email</a>
+              <a class="btn btn-primary" data-channel="whatsapp" target="_blank" rel="noopener" href="https://wa.me/15085775637">Message us on WhatsApp</a>
+              <a class="btn btn-outline" data-channel="sms" target="_blank" rel="noopener" href="sms:+15085775637">Send by SMS</a>
+              <a class="btn btn-outline" href="tel:+15085775637">Call 508-577-5637 <svg class="icon arrow" aria-hidden="true"><use href="#i-phone"></use></svg></a>
             </div>
-            <p class="tiny">Prefer to add detail? Call us and we'll pick it up from here.</p>
+            <p class="tiny">Need us right away? WhatsApp or SMS opens with your details ready to send. Or call 508-577-5637, Mon&ndash;Sat 7:00 AM&ndash;6:00 PM.</p>
           </div>
         </div>
 
@@ -436,6 +455,6 @@
                ]
 }
 </script>
-<script src="assets/js/site.js?v=20261007" defer></script>
+<script src="assets/js/site.js?v=20261009" defer></script>
 </body>
 </html>

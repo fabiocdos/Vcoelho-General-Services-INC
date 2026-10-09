@@ -54,16 +54,39 @@ Open `index.html` directly, or serve the folder with any static server.
 
 - Fields: Full Name · Phone · Email · Property Address · Service Needed · Property Type · Project details · optional photo upload
 - Client-side validation with inline error messages (`role="alert"`)
-- On success: thank-you message + a **mailto fallback** link pre-filled with the request
+- **Delivery (wired 2026-10-09):** the form POSTs as `FormData` to the FormSubmit
+  AJAX endpoint `https://formsubmit.co/ajax/vcoelhogeneralservices@hotmail.com`,
+  so the request - uploaded photos included - reaches
+  **vcoelhogeneralservices@hotmail.com**. The thank-you state is only shown when
+  FormSubmit actually answers `success: true`.
+- **Phone channel:** under the submit button, *Send it on WhatsApp*
+  (`wa.me/15085775637`) and *send a text* (`sms:+15085775637`) open the visitor's
+  app with the request text already filled in, so the same details reach
+  **508-577-5637**. Both shortcuts run the form validation first - a shortcut
+  cannot send an empty form. The thank-you panel repeats WhatsApp / SMS / Call.
+- **A request is never silently dropped:** if the POST fails or times out (30 s),
+  the form stays on screen and a `role="alert"` box offers the same three
+  channels with the data already filled in. Timeouts use different wording
+  ("your request may still be on its way") because an in-flight request can
+  still complete on the server.
+- **No JavaScript:** the form posts natively to `https://formsubmit.co/<email>`
+  with `multipart/form-data`; the `_next` hidden field returns the visitor to
+  `<page>?sent=1`, where `site.js` reveals the thank-you panel.
+- Spam control: hidden `_honey` honeypot (labelled for a11y checkers) with
+  `_captcha=false` - FormSubmit's reCAPTCHA would break the AJAX flow. `_subject`
+  and `_template=table` shape the email that lands in the inbox.
 - Lead data is also stored in `localStorage` under `vcoelho_leads` and pushed to `window.dataLayer`
-- Available via: header CTA, hero CTA, section CTAs, service-page CTAs, mobile bottom bar, and the inline form on `contact.html#quote`
+- Available via: header CTA, hero CTA, section CTAs, service-page CTAs, mobile bottom bar, and the inline forms on `contact.html#quote` and `request-a-quote.html`
 
-> **Not yet wired:** real form delivery (Formspree, Netlify Forms, or a backend endpoint).
-> Today submissions are validated client-side and handed off through `mailto:`.
+> **Activation:** the very first submission makes FormSubmit e-mail an
+> "Activate Form" link to `vcoelhogeneralservices@hotmail.com` - it has to be
+> clicked once. Endpoint confirmed answering
+> `{"success":"true","message":"The form was submitted successfully."}` on 2026-10-09.
 
 ## Lead tracking events
 
-`page_view` · `quote_open` · `quote_submit` · `quote_form_error` · `quote_email_fallback` ·
+`page_view` · `quote_open` · `quote_submit` · `quote_form_error` · `quote_delivered` ·
+`quote_send_failed` (carries `reason` + `timed_out`) · `quote_channel_click` ·
 `cta_click` · `phone_click` · `email_click` · `social_click` · `gallery_open` · `gallery_filter`
 
 All events are pushed to `window.dataLayer` (and to `gtag` if present), so dropping in
@@ -443,6 +466,71 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
    so the four duplicate versions collapse onto the canonical.
 3. Optional: the real Google Business Profile reviews URL (no link invented).
 4. Decision on switching the CTA wording to "REQUEST A FREE QUOTE".
+
+## Round 7 - quote form delivery (2026-10-09)
+
+Client request: the **request-a-quote** form must deliver its data to
+**508-577-5637** and **vcoelhogeneralservices@hotmail.com**.
+
+### What changed
+
+| File | Change |
+| --- | --- |
+| `contact.html`, `request-a-quote.html` | form posts to FormSubmit (`method=post`, `enctype=multipart/form-data`), hidden `_subject` / `_template` / `_captcha` / `_next` / `_honey`, new alert box, "send it yourself" row, thank-you panel with WhatsApp / SMS / Call |
+| `assets/js/site.js` | delivery layer: `postQuote()` (fetch + JSON + 30 s timeout), `channelUrls()` / `applyChannels()`, validation-gated channel links, per-cause failure wording, `?sent=1` panel, `collect()` helper |
+| `assets/css/style.css` | `.form-alt`, `.form-alert`, disabled-submit state - all scoped to the form, homepage height untouched |
+| all 10 pages | asset version `?v=20261009` (Hostinger caches CSS/JS for 7 days) |
+| `sitemap.xml` | `lastmod` 2026-10-09 on all 10 URLs |
+
+Two delivery paths, both carrying the same pre-filled text (name, phone, e-mail,
+address, service, property type, project):
+
+- **E-mail** - automatic: `fetch` POST to FormSubmit, thank-you state shown only
+  on `success: true`.
+- **Phone** - WhatsApp (`wa.me/15085775637`) and SMS (`sms:+15085775637`)
+  buttons in the form and again in the thank-you panel; the visitor's own app
+  sends the message, nothing is pushed to the phone automatically.
+
+### QA actually run (2026-10-09)
+
+- **Endpoint probes (curl, sending the `Origin`/`Referer` a browser sends):**
+  JSON and `multipart/form-data` both accepted; before activation it answered
+  `{"success":"false","message":"This form needs Activation..."}` (that is what
+  put the activation e-mail in the owner's inbox), afterwards
+  `{"success":"true","message":"The form was submitted successfully."}`.
+  Cold latency of a single request: **0.65 s**.
+- **Browser, local server on `:8787`:**
+  - success path with a stubbed `fetch` on `contact.html`: **25/25 assertions**
+  - real network-failure path: **10/10**
+  - real timeout path, waiting the actual 30 s: **9/9**
+  - `request-a-quote.html` markup: **15/15**; `?sent=1` return: **9/9**;
+    quote modal on `index.html`: **16/16**
+  - **0 console errors** in every run
+- **Gates:** final-qa 10 pages / 292 internal links / **0 broken / 0 issues**;
+  seo-qc **0**; seo-ld-check **0**; seo-a11y **0**; seo-anchors **0**;
+  link-check OK; W3C HTML5 (Nu) **0 errors / 0 warnings on all 10 pages**.
+- **Lighthouse** on `contact.html` + `request-a-quote.html`: accessibility 100,
+  best-practices 100, seo 100, **0 failures**.
+- **Layout:** homepage unchanged at **2285 @1004 / 2557 @1440 / 2301 @892**,
+  overflow 0; `contact.html` and `request-a-quote.html` overflow 0 at
+  360 / 600 / 768 / 1024 / 1440.
+
+### Stated plainly (what was NOT verified)
+
+- Delivery was verified as far as FormSubmit's HTTP response. **No one has
+  confirmed an e-mail actually landing in the owner's inbox** - the owner still
+  has to open it, confirm the activation click and check one test message.
+- Real test submissions sent to the owner's inbox during QA: "Maria Silva"
+  (fence request), "TESTE status da forma", "TESTE latencia fria".
+- Repeated requests from one machine were throttled by FormSubmit to ~30-35 s;
+  a single cold request was 0.65 s. That is why the client timeout is 30 s and
+  the timeout wording is deliberately hedged.
+- WhatsApp/SMS only work if the visitor's device has an app that handles the
+  scheme - the phone is never messaged automatically.
+- FormSubmit's reCAPTCHA is off (it would break the AJAX flow), so the honeypot
+  is the only spam filter. FormSubmit keeps submissions for 30 days; archive API
+  reads are limited to 5/day.
+
 ## Deployment
 
 - **Live (production):** https://vcoelhogeneralservices.com/ - Hostinger,
@@ -474,9 +562,12 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
 
 ## Open items
 
-1. **Form delivery.** The quote form still runs on the `mailto:` fallback plus
-   the local `vcoelho_leads` store - point it at a real endpoint (Formspree,
-   Hostinger PHP, Netlify Forms) to collect submissions server-side.
+1. **Form delivery - done (2026-10-09).** Submissions POST to FormSubmit and
+   land in `vcoelhogeneralservices@hotmail.com`; the WhatsApp / SMS buttons
+   carry the same pre-filled data to 508-577-5637. Owner's part: make sure
+   FormSubmit's "Activate Form" link has been clicked in that inbox, confirm one
+   test e-mail arrives, and keep an eye on spam now that FormSubmit's reCAPTCHA
+   is off (honeypot only).
 2. **Google Search Console + GA4.** The domain verification TXT record
    (`google-site-verification=...`) is already published in the Hostinger DNS by
    the owner. Still needed: add the *domain property* in Search Console, confirm

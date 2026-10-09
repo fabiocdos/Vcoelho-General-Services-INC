@@ -929,6 +929,29 @@ h4{font-size:1.3rem; line-height:1.25}
 }
 .is-dark .form-legal{color:rgba(255,255,255,.6)}
 
+/* "send it yourself" shortcuts: WhatsApp / SMS with the form data */
+.form-alt{
+  grid-column:1/-1;
+  font-size:13px; color:var(--ink-2); margin:0;
+}
+.form-alt a{font-weight:600; color:var(--green); text-decoration:underline; text-underline-offset:2px}
+
+/* shown only when the automatic e-mail send fails */
+.form-alert{
+  grid-column:1/-1;
+  padding:16px 18px;
+  border:1.5px solid rgba(176,110,30,.5);
+  border-radius:var(--radius);
+  background:#FCF4E7;
+}
+.form-alert p{margin:0; font-size:14px; line-height:1.55; color:#5C421A}
+.form-alert p + p{margin-top:10px}
+.form-alert strong{color:#46320F}
+.form-alert a{font-weight:600; color:#8A5312; text-decoration:underline; text-underline-offset:2px}
+.form-alert .tiny{color:#7A5F30}
+
+.quote-form button[disabled]{opacity:.75; cursor:progress}
+
 .form-success{
   display:none;
   text-align:center;

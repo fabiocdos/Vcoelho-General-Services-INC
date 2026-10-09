@@ -6,8 +6,13 @@
   'use strict';
 
   var PHONE_RAW = '+15085775637';
+  var PHONE_INT = '15085775637';
   var PHONE_FMT = '508-577-5637';
   var EMAIL = 'vcoelhogeneralservices@hotmail.com';
+  // FormSubmit AJAX endpoint: posts the form server-side to EMAIL and answers
+  // with JSON (Access-Control-Allow-Origin: *), so we can tell success from
+  // failure instead of guessing.
+  var FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + EMAIL;
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
 
@@ -163,6 +168,23 @@
   var SERVICES = ['Landscaping', 'Fencing', 'Hardscaping', 'Snow Plowing', 'Other'];
   var PROPERTY_TYPES = ['Residential', 'Commercial', 'Property Management'];
 
+  // Shown inside the form when the automatic e-mail send does not go through:
+  // the visitor can still deliver the same details by WhatsApp, SMS or e-mail.
+  function sendAlertMarkup() {
+    return '' +
+      '<div class="form-alert" data-form-alert role="alert" hidden>' +
+        '<p><strong data-alert-title>We couldn\'t send this automatically.</strong> <span data-alert-msg>Send your request right now &mdash; your details are already filled in:</span></p>' +
+        '<p class="form-alert-links">' +
+          '<a data-channel="whatsapp" target="_blank" rel="noopener" href="https://wa.me/' + PHONE_INT + '">Send on WhatsApp</a>' +
+          '<span aria-hidden="true"> &middot; </span>' +
+          '<a data-channel="sms" target="_blank" rel="noopener" href="sms:' + PHONE_RAW + '">Send by SMS</a>' +
+          '<span aria-hidden="true"> &middot; </span>' +
+          '<a data-mailto href="mailto:' + EMAIL + '">Send by e-mail</a>' +
+        '</p>' +
+        '<p class="tiny">You can also press submit again, or call ' + PHONE_FMT + '.</p>' +
+      '</div>';
+  }
+
   function quoteFormMarkup(idPrefix, opts) {
     opts = opts || {};
     var title = opts.title || 'Request a Quote';
@@ -194,7 +216,12 @@
         '<h2>' + title + '</h2>' +
         '<p>' + intro + '</p>' +
       '</div>' +
-      '<form class="quote-form" novalidate action="mailto:' + EMAIL + '" method="post" enctype="text/plain" data-quote-form>' +
+      '<form class="quote-form" novalidate action="https://formsubmit.co/' + EMAIL + '" method="post" enctype="multipart/form-data" data-quote-form>' +
+        '<input type="hidden" name="_subject" value="Quote request - vcoelhogeneralservices.com">' +
+        '<input type="hidden" name="_template" value="table">' +
+        '<input type="hidden" name="_captcha" value="false">' +
+        '<input type="hidden" name="_next" value="' + location.origin + location.pathname + '?sent=1">' +
+        '<input type="text" name="_honey" value="" style="display:none" tabindex="-1" autocomplete="off" aria-label="Leave this field empty">' +
         '<div class="form-grid">' +
           field({ id: idPrefix + '-name', name: 'fullName', label: 'Full Name', required: true,
             control: '<input type="text" id="' + idPrefix + '-name" name="fullName" autocomplete="name" placeholder="John Smith" required aria-describedby="' + idPrefix + '-name-error">' }) +
@@ -216,21 +243,27 @@
               '<input type="file" id="' + idPrefix + '-photos" name="photos" accept="image/*" multiple>' +
             '</label>' +
           '</div>' +
+          sendAlertMarkup() +
           '<div class="form-actions">' +
             '<button type="submit" class="btn btn-primary btn-lg btn-block">' + button + icon('arrow', 'arrow') + '</button>' +
           '</div>' +
+          '<p class="form-alt">Rather send it yourself? ' +
+            '<a data-channel="whatsapp" target="_blank" rel="noopener" href="https://wa.me/' + PHONE_INT + '">Send it on WhatsApp</a> or ' +
+            '<a data-channel="sms" target="_blank" rel="noopener" href="sms:' + PHONE_RAW + '">send a text</a> ' +
+            '&mdash; we pre-fill your message.</p>' +
           '<p class="form-legal">By submitting, you agree to be contacted about your request. We never share your details.</p>' +
         '</div>' +
       '</form>' +
       '<div class="form-success" hidden>' +
         '<div class="icon-badge">' + icon('check') + '</div>' +
         '<h3>Thank you for contacting Vcoelho General Services INC.</h3>' +
-        '<p>We\'ve received your request and will review your project details.</p>' +
+        '<p>Your request has been sent to our team. We\'ll review your project details and get back to you shortly.</p>' +
         '<div class="btn-row">' +
-          '<a class="btn btn-primary" href="tel:' + PHONE_RAW + '">Call ' + PHONE_FMT + icon('phone', 'arrow') + '</a>' +
-          '<a class="btn btn-outline" data-mailto href="#">Send by email</a>' +
+          '<a class="btn btn-primary" data-channel="whatsapp" target="_blank" rel="noopener" href="https://wa.me/' + PHONE_INT + '">Message us on WhatsApp</a>' +
+          '<a class="btn btn-outline" data-channel="sms" target="_blank" rel="noopener" href="sms:' + PHONE_RAW + '">Send by SMS</a>' +
+          '<a class="btn btn-outline" href="tel:' + PHONE_RAW + '">Call ' + PHONE_FMT + icon('phone', 'arrow') + '</a>' +
         '</div>' +
-        '<p class="tiny">Prefer to add detail? Call us and we\'ll pick it up from here.</p>' +
+        '<p class="tiny">Need us right away? WhatsApp or SMS opens with your details ready to send. Or call ' + PHONE_FMT + ', Mon&ndash;Sat 7:00 AM&ndash;6:00 PM.</p>' +
       '</div>';
   }
 
@@ -362,6 +395,92 @@
     return ok;
   }
 
+  /* ---- delivery helpers: FormSubmit e-mail + WhatsApp/SMS copies ---- */
+
+  function collect(form) {
+    var data = {};
+    $$('input, select, textarea', form).forEach(function (el) {
+      if (el.type === 'file') { data.photos = el.files ? el.files.length : 0; }
+      else if (el.name && el.name.charAt(0) !== '_') { data[el.name] = el.value.trim(); }
+    });
+    return data;
+  }
+
+  function quoteText(data) {
+    return [
+      'Quote request from vcoelhogeneralservices.com',
+      '',
+      'Name: ' + data.fullName,
+      'Phone: ' + data.phone,
+      'Email: ' + (data.email || '—'),
+      'Address: ' + (data.address || '—'),
+      'Service: ' + data.service,
+      'Property type: ' + data.propertyType,
+      '',
+      'Project:',
+      data.message
+    ].join('\n');
+  }
+
+  function channelUrls(data) {
+    var text = quoteText(data);
+    var subject = 'Quote request — ' + (data.service || 'General') +
+      (data.propertyType ? ' (' + data.propertyType + ')' : '');
+    var mailBody = text + (data.photos ? '\n\nPhotos selected: ' + data.photos + ' (attach them in this e-mail)' : '');
+    return {
+      whatsapp: 'https://wa.me/' + PHONE_INT + '?text=' + encodeURIComponent(text),
+      sms: 'sms:' + PHONE_RAW + '?&body=' + encodeURIComponent(text),
+      email: 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailBody)
+    };
+  }
+
+  // Fill every WhatsApp / SMS / e-mail shortcut in scope with the details
+  // currently in the form.
+  function applyChannels(scope, data) {
+    var urls = channelUrls(data);
+    $$('[data-channel]', scope).forEach(function (a) {
+      var kind = a.getAttribute('data-channel');
+      if (urls[kind]) a.setAttribute('href', urls[kind]);
+    });
+    $$('[data-mailto]', scope).forEach(function (a) { a.setAttribute('href', urls.email); });
+  }
+
+  // POST the form to FormSubmit and resolve with its JSON body.
+  function postQuote(fd) {
+    var timeout = new Promise(function (resolve, reject) {
+      setTimeout(function () { reject(new Error('Timed out after 30 seconds')); }, 30000);
+    });
+    var request = fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: fd
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        var out = null;
+        try { out = JSON.parse(t); } catch (e) { out = null; }
+        if (!out) throw new Error('Unexpected response (HTTP ' + r.status + ')');
+        return out;
+      });
+    });
+    return Promise.race([request, timeout]);
+  }
+
+  // Static pages come back from FormSubmit's no-JavaScript submit with ?sent=1.
+  function showSentPanel() {
+    var panels = $$('.form-success').filter(function (p) { return !p.closest('#quoteModal'); });
+    if (!panels.length) return;
+    var s = panels[0];
+    var wrap = s.parentNode;
+    var f = $('[data-quote-form]', wrap);
+    var head = $('.form-head', wrap);
+    if (f) f.hidden = true;
+    if (head) head.hidden = true;
+    s.hidden = false;
+    s.classList.add('is-visible');
+    var h = $('h3', s);
+    if (h) { h.setAttribute('tabindex', '-1'); h.focus(); }
+  }
+
   function bindForm(form, source) {
     if (!form || form.dataset.bound === '1') return;
     form.dataset.bound = '1';
@@ -388,19 +507,28 @@
       });
     });
 
+    // WhatsApp / SMS / e-mail shortcuts inside the form: they only go through
+    // once the visitor's details validate, and they carry the filled-in data.
+    $$('[data-channel], [data-mailto]', form).forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        if (!validate(form)) { e.preventDefault(); return; }
+        var kind = a.getAttribute('data-channel') || 'email';
+        var urls = channelUrls(collect(form));
+        if (urls[kind]) a.setAttribute('href', urls[kind]);
+        track('quote_channel_click', { channel: kind, page: pageName() });
+      });
+    });
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (form.dataset.sending === '1') return;
 
       if (!validate(form)) {
         track('quote_form_error', { source: source, page: pageName() });
         return;
       }
 
-      var data = {};
-      $$('input, select, textarea', form).forEach(function (el) {
-        if (el.type === 'file') { data.photos = el.files ? el.files.length : 0; }
-        else if (el.name) { data[el.name] = el.value.trim(); }
-      });
+      var data = collect(form);
 
       var lead = Object.assign({
         submittedAt: new Date().toISOString(),
@@ -420,42 +548,61 @@
 
       var wrap = form.parentNode;
       var success = $('.form-success', wrap);
-
-      var subject = 'Quote request — ' + data.service + ' (' + data.propertyType + ')';
-      var body = [
-        'Name: ' + data.fullName,
-        'Phone: ' + data.phone,
-        'Email: ' + (data.email || '—'),
-        'Address: ' + (data.address || '—'),
-        'Service: ' + data.service,
-        'Property type: ' + data.propertyType,
-        '',
-        'Project:',
-        data.message,
-        '',
-        'Photos attached: ' + (data.photos || 0),
-        '',
-        'Source: ' + source + ' / ' + pageName()
-      ].join('\n');
-
-      form.hidden = true;
+      var alertBox = $('[data-form-alert]', wrap);
       var head = $('.form-head', wrap);
-      if (head) head.hidden = true;
-      if (success) {
-        success.hidden = false;
-        success.classList.add('is-visible');
-        var mail = $('[data-mailto]', success);
-        if (mail) {
-          mail.href = 'mailto:' + EMAIL +
-            '?subject=' + encodeURIComponent(subject) +
-            '&body=' + encodeURIComponent(body);
-          mail.addEventListener('click', function () {
-            track('quote_email_fallback', { service: data.service, page: pageName() });
+      var btn = $('button[type="submit"]', form);
+      var btnHtml = btn ? btn.innerHTML : '';
+
+      // Every shortcut (in the form, in the alert and in the thank-you panel)
+      // gets the visitor's own details before anything is sent.
+      applyChannels(wrap, data);
+      if (alertBox) alertBox.hidden = true;
+
+      form.dataset.sending = '1';
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+      postQuote(new FormData(form))
+        .then(function (res) {
+          if (!(res.success === true || res.success === 'true')) {
+            throw new Error(res.message || 'FormSubmit did not confirm delivery');
+          }
+          form.hidden = true;
+          if (head) head.hidden = true;
+          if (success) {
+            success.hidden = false;
+            success.classList.add('is-visible');
+            var h = $('h3', success);
+            if (h) { h.setAttribute('tabindex', '-1'); h.focus(); }
+          }
+          track('quote_delivered', { method: 'email', service: data.service, page: pageName() });
+        })
+        .catch(function (err) {
+          // Never lose the request: keep the form on screen and hand the
+          // visitor the WhatsApp / SMS / e-mail buttons with the data in them.
+          var msg = String((err && err.message) || err);
+          var timedOut = msg.indexOf('Timed out') === 0;
+          if (alertBox) {
+            var title = $('[data-alert-title]', alertBox);
+            var text = $('[data-alert-msg]', alertBox);
+            if (title) title.textContent = timedOut ? 'This is taking longer than expected.' : 'We couldn\'t send this automatically.';
+            if (text) {
+              text.textContent = timedOut
+                ? 'Your request may still be on its way — if you don\'t hear back from us, send it again or use the buttons below:'
+                : 'Send your request right now — your details are already filled in:';
+            }
+            alertBox.hidden = false;
+            if (alertBox.scrollIntoView) alertBox.scrollIntoView({ block: 'center' });
+          }
+          track('quote_send_failed', {
+            page: pageName(),
+            reason: msg.slice(0, 160),
+            timed_out: timedOut
           });
-        }
-        var h = $('h3', success);
-        if (h) { h.setAttribute('tabindex', '-1'); h.focus(); }
-      }
+        })
+        .then(function () {
+          form.dataset.sending = '0';
+          if (btn) { btn.disabled = false; btn.innerHTML = btnHtml; }
+        });
     });
   }
 
@@ -640,6 +787,9 @@
     initGallery();
     initReveal();
     initTracking();
+
+    // no-JavaScript submit returned by FormSubmit via the _next field
+    if (location.search.indexOf('sent=1') !== -1) showSentPanel();
 
     // Deep link: contact.html#quote scrolls to the inline form when one exists
     // on the page; elsewhere it opens the modal.

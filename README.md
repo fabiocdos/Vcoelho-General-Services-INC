@@ -92,8 +92,9 @@ Open `index.html` directly, or serve the folder with any static server.
 `quote_send_failed` (carries `reason` + `timed_out`) · `quote_channel_click` ·
 `cta_click` · `phone_click` · `email_click` · `social_click` · `gallery_open` · `gallery_filter`
 
-All events are pushed to `window.dataLayer` (and to `gtag` if present), so dropping in
-Google Tag Manager or GA4 is a one-line change.
+All events are pushed to `window.dataLayer` (and to `gtag` if present). The GA4
+Google tag is installed since Round 8, so every event above already reaches
+`gtag('config', 'G-Q991L5PVLW')` without any further wiring.
 
 ## Mobile
 
@@ -409,7 +410,8 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
   + skip link present, alt on all images.
 - No performance change needed: one deferred script, one stylesheet, Google Fonts
   with `preconnect` + `display=swap`, no third-party scripts, images sized/lazy.
-  **No analytics is installed** (GA4/GSC ID needed from the owner).
+  **No analytics is installed** (GA4/GSC ID needed from the owner) - *superseded
+  by Round 8: the GA4 tag has been installed since 2026-11-05.*
 
 ### Internal linking / conversion
 
@@ -464,7 +466,9 @@ colors, navigation and the frozen homepage are untouched (heights re-measured at
 
 ### Still needed from the owner
 
-1. Google Search Console verification (string or DNS TXT) and the GA4 ID.
+1. Google Search Console verification (string or DNS TXT) and the GA4 ID -
+   *the GA4 ID arrived and was installed in Round 8 (2026-11-05); the Search
+   Console steps are still open.*
 2. Hostinger redirect rules: force HTTPS and redirect `www.` to the bare domain,
    so the four duplicate versions collapse onto the canonical.
 3. Optional: the real Google Business Profile reviews URL (no link invented).
@@ -534,6 +538,65 @@ address, service, property type, project):
   is the only spam filter. FormSubmit keeps submissions for 30 days; archive API
   reads are limited to 5/day.
 
+## Round 8 - GA4 (2026-11-05)
+
+### What changed
+
+| Files | Change |
+|---|---|
+| all 10 pages | Google tag (gtag.js) **`G-Q991L5PVLW`** inserted in Google's own snippet format, **immediately before `</head>`** |
+| all 10 pages | asset version `?v=20261009` → **`?v=20261105`** (Hostinger caches CSS/JS for 7 days) |
+| `sitemap.xml` | `lastmod` → **2026-11-05** on all 10 URLs |
+
+The snippet is Google's, byte for byte:
+
+```html
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q991L5PVLW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-Q991L5PVLW');
+</script>
+```
+
+### QA actually run (2026-11-05)
+
+- **Gates:** final-qa **10 pages / 292 internal links / 0 broken / 0 issues**;
+  seo-qc **0 issues** (its new assertion is that the config line is the last
+  element before `</head>` on every page, plus the usual canonical / OG /
+  JSON-LD / robots / sitemap / asset-version checks).
+- **W3C Nu:** **0 errors / 0 warnings on all 10 pages.**
+- **Lighthouse:** local **and** production - accessibility 100, best-practices
+  100, seo 100, **0 failures**.
+- **Browser, local server on `:8787`:** `gtag/js` HTTP **200**, `dataLayer`
+  populated (6 entries), `gtag` is a function, the GA config script is the last
+  child of `<head>`, **0 console errors**.
+- **Browser, production:** `gtag/js` **200**; `g/collect` POST answered **204**
+  carrying `tid=G-Q991L5PVLW` and `en=page_view`; **0 console errors**;
+  overflow 0.
+- **Production HTML:** all **10/10** pages serve the tag before `</head>` with
+  `?v=20261105`; `sitemap.xml` `lastmod` is `2026-11-05`; `robots.txt` unchanged
+  (80 bytes, byte-identical to spec).
+- **pack-site:** 39 entries, 10 HTML, **0 non-publishable files**, GA4 snippet
+  present in the packaged homepage.
+
+### Stated plainly (what was NOT verified)
+
+- The request leaves the browser and Google answers **204**, but **nobody has
+  confirmed a hit inside the GA4 property** - Realtime / Reports is the owner's
+  check (Open item #2).
+- **Layout:** the tag is `async` inside `<head>` and changes no layout. For the
+  record, this run measured the homepage at **2292 px @ 892x574**, against the
+  frozen **2301 px @ 892**: the 9 px is the hero's `min-height:min(46vh,350px)`
+  cap, which only binds on a taller window. A/B checked in the browser -
+  forcing `.hero{min-height:350px}` gives **exactly 2301 px**, and removing it
+  returns 2292 px. No CSS changed in this round.
+- 1004 px and 1440 px widths were **not** re-measured in this round (the review
+  browser is fixed at 892 px wide); no CSS was touched, so 2285 / 2557 stand
+  from Round 7.
+
 ## Deployment
 
 - **Live (production):** https://vcoelhogeneralservices.com/ - Hostinger,
@@ -546,7 +609,12 @@ address, service, property type, project):
   served `request-a-quote.html` carries the FormSubmit action, the honeypot and
   the `?v=20261009` assets, the sitemap `lastmod` is 2026-10-09, and a real
   test submission posted from the live page was accepted by FormSubmit in
-  1.19 s (thank-you state, no fallback).
+  1.19 s (thank-you state, no fallback). Re-verified on **2026-11-05** after
+  the GA4 push (Round 8): **10/10** served pages carry the `G-Q991L5PVLW` tag
+  immediately before `</head>` with the `?v=20261105` assets, `sitemap.xml`
+  `lastmod` is 2026-11-05, `robots.txt` is unchanged, and the live page fires
+  `gtag/js` (200) plus a `g/collect` hit answered 204 with
+  `tid=G-Q991L5PVLW`.
 - **Preview:** https://fabiocdos.github.io/Vcoelho-General-Services-INC/ - GitHub
   Pages, branch `main`, source folder `/`, HTTPS enforced; rebuilds ~1 min after
   each push. Repo: https://github.com/fabiocdos/Vcoelho-General-Services-INC
@@ -577,9 +645,12 @@ address, service, property type, project):
    is off (honeypot only).
 2. **Google Search Console + GA4.** The domain verification TXT record
    (`google-site-verification=...`) is already published in the Hostinger DNS by
-   the owner. Still needed: add the *domain property* in Search Console, confirm
-   the verification and submit `sitemap.xml`; plus the GA4 measurement ID (not
-   added - it must not be invented).
+   the owner, and the **GA4 tag `G-Q991L5PVLW` is installed on all 10 pages
+   since 2026-11-05 (Round 8)** - it loads and sends a `page_view` from both
+   the local server and production. Still needed from the owner: add the *domain
+   property* in Search Console, confirm the verification and submit
+   `sitemap.xml`; then open the GA4 property and confirm data is arriving
+   (Realtime). Nothing further has to be added to the site for GA4.
 3. **Hostinger redirects.** Force HTTPS and send `www.` to the bare domain -
    canonicals, OG and the sitemap already use
    `https://vcoelhogeneralservices.com/`.
